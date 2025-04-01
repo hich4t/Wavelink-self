@@ -249,7 +249,7 @@ class Player(discord.VoiceProtocol):
 
         member_list = self.channel.members if hasattr(self.channel, "members") else self.channel.recipients
         
-        members: int = len([m for m in self.channel.members if not m.bot])
+        members: int = len([m for m in member_list if not m.bot])
         self._inactive_channel_count = (
             self._inactive_channel_count - 1 if not members else self._inactive_channel_limit or 0
         )
