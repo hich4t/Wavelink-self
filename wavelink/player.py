@@ -109,7 +109,10 @@ class Player(discord.VoiceProtocol):
     def __call__(self, client: discord.Client, channel: VocalGuildChannel) -> Self:
         super().__init__(client, channel)
 
-        self._guild = channel.guild
+        if channel.guild == None:
+            self._guild = channel
+        else:
+            self._guild = channel.guild
 
         return self
 
@@ -244,6 +247,8 @@ class Player(discord.VoiceProtocol):
         if not self.channel:
             return
 
+        member_list = self.channel.members if hasattr(self.channel, "members") else self.channel.recipients
+        
         members: int = len([m for m in self.channel.members if not m.bot])
         self._inactive_channel_count = (
             self._inactive_channel_count - 1 if not members else self._inactive_channel_limit or 0
@@ -825,12 +830,18 @@ class Player(discord.VoiceProtocol):
             raise InvalidChannelStateException(f"Player tried to connect without a valid channel: {msg}")
 
         if not self._guild:
-            self._guild = self.channel.guild
+            if not self.channel.guild:
+                self._guild = self.channel
+            else:
+                self._guild = self.channel.guild
 
         self.node._players[self._guild.id] = self
 
         assert self.guild is not None
-        await self.guild.change_voice_state(channel=self.channel, self_mute=self_mute, self_deaf=self_deaf)
+        try:
+            await self.guild.change_voice_state(channel=self.channel, self_mute=self_mute, self_deaf=self_deaf)
+        except Exception as e:
+            await self.client.change_voice_state(channel=self.channel, self_mute=self_mute, self_deaf=self_deaf)
 
         try:
             async with async_timeout.timeout(timeout):
@@ -885,7 +896,10 @@ class Player(discord.VoiceProtocol):
         self_deaf = bool(self_deaf)
         self_mute = bool(self_mute)
 
-        await self.guild.change_voice_state(channel=channel, self_mute=self_mute, self_deaf=self_deaf)
+        try:
+            await self.guild.change_voice_state(channel=channel, self_mute=self_mute, self_deaf=self_deaf)
+        except:
+            await self.client.change_voice_state(channel=channel, self_mute=self_mute, self_deaf=self_deaf)
 
         if channel is None:
             self._reconnecting.set()
