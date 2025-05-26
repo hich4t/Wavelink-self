@@ -1,4 +1,4 @@
-git+https://github.com/dolfies/discord.py-self@renamed#egg=selfcord.py[voice]
+selfcord.py @ git+https://github.com/dolfies/discord.py-self@renamed#egg=selfcord.py[voice]
 aiohttp>=3.7.4,<4
 yarl>=1.9.2
 async_timeout
