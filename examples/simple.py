@@ -26,18 +26,18 @@ import asyncio
 import logging
 from typing import cast
 
-import discord
-from discord.ext import commands
+import selfcord
+from selfcord.ext import commands
 
 import wavelink
 
 
 class Bot(commands.Bot):
     def __init__(self) -> None:
-        intents: discord.Intents = discord.Intents.default()
+        intents: selfcord.Intents = selfcord.Intents.default()
         intents.message_content = True
 
-        discord.utils.setup_logging(level=logging.INFO)
+        selfcord.utils.setup_logging(level=logging.INFO)
         super().__init__(command_prefix="?", intents=intents)
 
     async def setup_hook(self) -> None:
@@ -61,7 +61,7 @@ class Bot(commands.Bot):
         original: wavelink.Playable | None = payload.original
         track: wavelink.Playable = payload.track
 
-        embed: discord.Embed = discord.Embed(title="Now Playing")
+        embed: selfcord.Embed = selfcord.Embed(title="Now Playing")
         embed.description = f"**{track.title}** by `{track.author}`"
 
         if track.artwork:
@@ -94,7 +94,7 @@ async def play(ctx: commands.Context, *, query: str) -> None:
         except AttributeError:
             await ctx.send("Please join a voice channel first before using this command.")
             return
-        except discord.ClientException:
+        except selfcord.ClientException:
             await ctx.send("I was unable to join this voice channel. Please try again.")
             return
 
@@ -136,7 +136,7 @@ async def play(ctx: commands.Context, *, query: str) -> None:
     # Optionally delete the invokers message...
     try:
         await ctx.message.delete()
-    except discord.HTTPException:
+    except selfcord.HTTPException:
         pass
 
 

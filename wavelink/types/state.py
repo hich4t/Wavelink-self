@@ -56,7 +56,7 @@ class PlayerBasicState(TypedDict):
     Attributes
     ----------
     voice_state: :class:`PlayerVoiceState`
-        The voice state received via Discord. Includes the voice connection ``token``, ``endpoint`` and ``session_id``.
+        The voice state received via selfcord. Includes the voice connection ``token``, ``endpoint`` and ``session_id``.
     position: int
         The player position.
     connected: bool

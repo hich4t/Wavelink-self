@@ -31,9 +31,9 @@ import time
 from typing import TYPE_CHECKING, Any, TypeAlias
 
 import async_timeout
-import discord
-from discord.abc import Connectable
-from discord.utils import MISSING
+import selfcord
+from selfcord.abc import Connectable
+from selfcord.utils import MISSING
 
 import wavelink
 
@@ -60,8 +60,8 @@ from .tracks import Playable, Playlist
 if TYPE_CHECKING:
     from collections import deque
 
-    from discord.abc import Connectable
-    from discord.types.voice import (
+    from selfcord.abc import Connectable
+    from selfcord.types.voice import (
         GuildVoiceState as GuildVoiceStatePayload,
         VoiceServerUpdate as VoiceServerUpdatePayload,
     )
@@ -76,7 +76,7 @@ if TYPE_CHECKING:
     from .types.request import Request as RequestPayload
     from .types.state import PlayerBasicState, PlayerVoiceState, VoiceState
 
-    VocalGuildChannel = discord.VoiceChannel | discord.StageChannel
+    VocalGuildChannel = selfcord.VoiceChannel | selfcord.StageChannel
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -84,17 +84,17 @@ logger: logging.Logger = logging.getLogger(__name__)
 T_a: TypeAlias = list[Playable] | Playlist
 
 
-class Player(discord.VoiceProtocol):
-    """The Player is a :class:`discord.VoiceProtocol` used to connect your :class:`discord.Client` to a
-    :class:`discord.VoiceChannel`.
+class Player(selfcord.VoiceProtocol):
+    """The Player is a :class:`selfcord.VoiceProtocol` used to connect your :class:`selfcord.Client` to a
+    :class:`selfcord.VoiceChannel`.
 
     The player controls the music elements of the bot including playing tracks, the queue, connecting etc.
     See Also: The various methods available.
 
     .. note::
 
-        Since the Player is a :class:`discord.VoiceProtocol`, it is attached to the various ``voice_client`` attributes
-        in discord.py, including ``guild.voice_client``, ``ctx.voice_client`` and ``interaction.voice_client``.
+        Since the Player is a :class:`selfcord.VoiceProtocol`, it is attached to the various ``voice_client`` attributes
+        in selfcord.py, including ``guild.voice_client``, ``ctx.voice_client`` and ``interaction.voice_client``.
 
     Attributes
     ----------
@@ -106,7 +106,7 @@ class Player(discord.VoiceProtocol):
 
     channel: VocalGuildChannel
 
-    def __call__(self, client: discord.Client, channel: VocalGuildChannel) -> Self:
+    def __call__(self, client: selfcord.Client, channel: VocalGuildChannel) -> Self:
         super().__init__(client, channel)
 
         if channel.guild == None:
@@ -117,12 +117,12 @@ class Player(discord.VoiceProtocol):
         return self
 
     def __init__(
-        self, client: discord.Client = MISSING, channel: Connectable = MISSING, *, nodes: list[Node] | None = None
+        self, client: selfcord.Client = MISSING, channel: Connectable = MISSING, *, nodes: list[Node] | None = None
     ) -> None:
         super().__init__(client, channel)
 
-        self.client: discord.Client = client
-        self._guild: discord.Guild | None = None
+        self.client: selfcord.Client = client
+        self._guild: selfcord.Guild | None = None
 
         self._voice_state: PlayerVoiceState = {"voice": {}}
 
@@ -451,7 +451,7 @@ class Player(discord.VoiceProtocol):
     def state(self) -> PlayerBasicState:
         """Property returning a dict of the current basic state of the player.
 
-        This property includes the ``voice_state`` received via Discord.
+        This property includes the ``voice_state`` received via selfcord.
 
         Returns
         -------
@@ -480,7 +480,7 @@ class Player(discord.VoiceProtocol):
 
             Caution should be used when using this method. If this method fails, your player might be left in a stale
             state. Consider handling cases where the player is unable to connect to the new node. To avoid stale state
-            in both wavelink and discord.py, it is recommended to disconnect the player when a RuntimeError occurs.
+            in both wavelink and selfcord.py, it is recommended to disconnect the player when a RuntimeError occurs.
 
         Parameters
         ----------
@@ -654,8 +654,8 @@ class Player(discord.VoiceProtocol):
         return self._node
 
     @property
-    def guild(self) -> discord.Guild | None:
-        """Returns the :class:`Player`'s associated :class:`discord.Guild`.
+    def guild(self) -> selfcord.Guild | None:
+        """Returns the :class:`Player`'s associated :class:`selfcord.Guild`.
 
         Could be None if this :class:`Player` has not been connected.
         """
@@ -706,7 +706,7 @@ class Player(discord.VoiceProtocol):
 
     @property
     def ping(self) -> int:
-        """Returns the ping in milliseconds as int between your connected Lavalink Node and Discord (Players Channel).
+        """Returns the ping in milliseconds as int between your connected Lavalink Node and selfcord (Players Channel).
 
         Returns ``-1`` if no player update event has been received or the player is not connected.
         """
@@ -812,10 +812,10 @@ class Player(discord.VoiceProtocol):
 
         .. warning::
 
-            Do not use this method directly on the player. See: :meth:`discord.VoiceChannel.connect` for more details.
+            Do not use this method directly on the player. See: :meth:`selfcord.VoiceChannel.connect` for more details.
 
 
-        Pass the :class:`wavelink.Player` to ``cls=`` in :meth:`discord.VoiceChannel.connect`.
+        Pass the :class:`wavelink.Player` to ``cls=`` in :meth:`selfcord.VoiceChannel.connect`.
 
 
         Raises
@@ -826,7 +826,7 @@ class Player(discord.VoiceProtocol):
             You tried to connect this player without an appropriate voice channel.
         """
         if self.channel is MISSING:
-            msg: str = 'Please use "discord.VoiceChannel.connect(cls=...)" and pass this Player to cls.'
+            msg: str = 'Please use "selfcord.VoiceChannel.connect(cls=...)" and pass this Player to cls.'
             raise InvalidChannelStateException(f"Player tried to connect without a valid channel: {msg}")
 
         if not self._guild:
@@ -862,7 +862,7 @@ class Player(discord.VoiceProtocol):
 
         Parameters
         ----------
-        channel: :class:`discord.VoiceChannel` | :class:`discord.StageChannel`
+        channel: :class:`selfcord.VoiceChannel` | :class:`selfcord.StageChannel`
             The new channel to move to.
         timeout: float
             The timeout in ``seconds`` before raising. Defaults to 10.0.
@@ -885,7 +885,7 @@ class Player(discord.VoiceProtocol):
 
         self._connection_event.clear()
         self._reconnecting.clear()
-        voice: discord.VoiceState | None = self.guild.me.voice
+        voice: selfcord.VoiceState | None = self.guild.me.voice
 
         if self_deaf is None and voice:
             self_deaf = voice.self_deaf
